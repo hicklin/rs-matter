@@ -119,6 +119,7 @@ pub mod sc;
 pub mod tlv;
 pub mod transport;
 pub mod utils;
+pub mod cluster_task_scheduler;
 
 /// Re-export several crates
 ///
