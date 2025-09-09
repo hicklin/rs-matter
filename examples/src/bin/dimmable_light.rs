@@ -279,6 +279,7 @@ pub struct LevelControlHandler {
     current_level: Cell<u8>,
     startup_current_level: Cell<Nullable<u8>>,
     remaining_time: Cell<u16>,
+    current_frequency: Cell<u16>,
     on_off_transition_time: Cell<u16>,
     on_transition_time: Cell<Nullable<u16>>,
     off_transition_time: Cell<Nullable<u16>>,
@@ -295,6 +296,7 @@ impl LevelControlHandler {
             current_level: Cell::new(1),
             startup_current_level: Cell::new(Nullable::some(73)),
             remaining_time: Cell::new(0),
+            current_frequency: Cell::new(2),
             on_off_transition_time: Cell::new(0),
             on_transition_time: Cell::new(Nullable::none()),
             off_transition_time: Cell::new(Nullable::none()),
@@ -314,6 +316,21 @@ impl LevelControlHooks for LevelControlHandler {
         // This is where business logic is implemented to physically change the level.
         info!("LevelControlHandler::set_level: setting level to {}", level);
         Ok(level)
+    }
+
+    fn set_frequency(&self, frequency: u16) -> Result<u16, ()> {
+        info!("LevelControlHandler::set_frequency: setting frequency to {}", frequency);
+        let level = self.set_level(frequency.div_euclid(2))?;
+        Ok(level * 2)
+    }
+
+    fn get_frequency_at_current_level(&self) -> Result<u16, ()> {
+        // Assuming frequency is double the level.
+        Ok(self.current_level.get() * 2);
+    }
+
+    fn get_level_at_current_frequency(&self) -> Result<u8, Error> {
+        Ok(self.current_frequency.get().div_ceil(2))
     }
 
     fn raw_get_options(&self) -> Result<OptionsBitmap, Error> {
@@ -367,6 +384,23 @@ impl LevelControlHooks for LevelControlHandler {
     fn raw_set_remaining_time(&self, value: u16) -> Result<(), Error> {
         self.remaining_time.set(value);
         Ok(())
+    }
+
+    fn raw_get_current_frequency(&self) -> Result<u16, Error> {
+        self.current_frequency.get()        
+    }
+
+    fn raw_set_current_frequency(&self, value: u16) -> Result<(), Error> {
+        self.current_frequency.set(value);
+        Ok(())
+    }
+
+    fn raw_get_min_frequency(&self) -> Result<u16, Error> {
+        Self::MIN_LEVEL * 2
+    }
+
+    fn raw_get_max_frequency(&self) -> Result<u16, Error> {
+        Self::MAX_LEVEL * 2
     }
 
     fn raw_get_on_off_transition_time(&self) -> Result<u16, Error> {
