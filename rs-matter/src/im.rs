@@ -42,36 +42,122 @@ mod timed;
 /// Interaction Model ID as per the Matter Core spec
 pub const PROTO_ID_INTERACTION_MODEL: u16 = 0x01;
 
-/// An enumeration of all possible error codes that can be returned by the Interaction Model.
+/// Global status codes for the Interaction Model.
+/// These MAY be used by interaction model processing of actions and as common status codes for cluster specifications.
+/// All values not defined here SHALL be reserved (per general conventions).
 #[derive(FromPrimitive, Debug, Clone, Copy, PartialEq, Eq, Hash)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum IMStatusCode {
-    Success = 0,
-    Failure = 1,
-    InvalidSubscription = 0x7D,
-    UnsupportedAccess = 0x7E,
-    UnsupportedEndpoint = 0x7F,
+    /// Operation was successful.
+    Success = 0x00,
+    /// Operation was not successful.
+    Failure = 0x01,
+    /// Subscription ID is not active.
+    InvalidSubscription = 0x7d,
+    /// The sender of the action or command does not have authorization or access.
+    UnsupportedAccess = 0x7e,
+    /// The endpoint indicated is unsupported on the node.
+    UnsupportedEndpoint = 0x7f,
+    /// The action is malformed, has missing fields, or fields with invalid values.
+    /// Action not carried out.
     InvalidAction = 0x80,
+    /// The indicated command ID is not supported on the cluster instance.
+    /// Command not carried out.
     UnsupportedCommand = 0x81,
+    /// The cluster command is malformed, has missing fields, or fields with invalid values.
+    /// Command not carried out.
     InvalidCommand = 0x85,
+    /// The indicated attribute ID, field ID or list entry does not exist for an attribute path.
     UnsupportedAttribute = 0x86,
+    /// Out of range error or set to a reserved value.
+    /// Attribute keeps its old value.
+    /// Note that an attribute value may be out of range if an attribute is related to another, e.g. with minimum and maximum attributes.
     ConstraintError = 0x87,
+    /// Attempt to write a read-only attribute.
     UnsupportedWrite = 0x88,
+    /// An action or operation failed due to insufficient available resources.
     ResourceExhausted = 0x89,
+    /// The indicated data field or entry could not be found.
     NotFound = 0x8b,
+    /// Reports cannot be issued for this attribute.
     UnreportableAttribute = 0x8c,
+    /// The data type indicated is undefined or invalid for the indicated data field.
+    /// Command or action not carried out.
     InvalidDataType = 0x8d,
+    /// Attempt to read a write-only attribute.
     UnsupportedRead = 0x8f,
+    /// Cluster instance data version did not match request path
     DataVersionMismatch = 0x92,
+    /// The transaction was aborted due to time being exceeded.
     Timeout = 0x94,
+    /// The node ID indicated is not supported on the node.
+    UnsupportedNode = 0x9b,
+    /// The receiver is busy processing another action that prevents the execution of the incoming action.
     Busy = 0x9c,
+    /// The access to the action or command by the sender is permitted by the ACL but restricted by the ARL.
+    AccessRestricted = 0x9d,
+    /// The cluster indicated is not supported on the endpoint.
     UnsupportedCluster = 0xc3,
+    /// Used by proxies to convey to clients the lack of an upstream subscription to a source.
     NoUpstreamSubscription = 0xc5,
+    /// A Untimed Write or Untimed Invoke interaction was used for an attribute or command that requires a Timed Write or Timed Invoke.
     NeedsTimedInteraction = 0xc6,
+    /// The indicated event ID is not supported on the cluster instance.
     UnsupportedEvent = 0xc7,
+    /// The receiver has insufficient resources to support the specified number of paths in the request
     PathsExhausted = 0xc8,
+    /// A request with TimedRequest field set to TRUE was issued outside a Timed transaction or a request with TimedRequest set to FALSE was issued inside a Timed transaction.
     TimedRequestMisMatch = 0xc9,
+    /// A request requiring a Fail-safe context was invoked without the Fail-Safe context.
     FailSafeRequired = 0xca,
+    /// The received request cannot be handled due to the current operational state of the device
+    InvalidInState = 0xcb,
+    /// A CommandDataIB is missing a response in the InvokeResponses of an Invoke Response action.
+    NoCommandResponse = 0xcc,
+    /// The node requires updated TC acceptance.
+    /// The user MAY be directed to visit the EnhancedSetupFlowMaintenanceUrl to complete this.
+    TermsAndConditionsChanged = 0xcd,
+    /// The node requires the user to visit the EnhancedSetupFlowMaintenanceUrl for instructions on further action.
+    MaintenanceRequired = 0xce,
+}
+
+impl Into<ErrorCode> for IMStatusCode {
+    fn into(self) -> ErrorCode {
+        match self {
+            IMStatusCode::Success => todo!(),
+            IMStatusCode::Failure => todo!(),
+            IMStatusCode::InvalidSubscription => todo!(),
+            IMStatusCode::UnsupportedAccess => todo!(),
+            IMStatusCode::UnsupportedEndpoint => todo!(),
+            IMStatusCode::InvalidAction => todo!(),
+            IMStatusCode::UnsupportedCommand => todo!(),
+            IMStatusCode::InvalidCommand => todo!(),
+            IMStatusCode::UnsupportedAttribute => todo!(),
+            IMStatusCode::ConstraintError => todo!(),
+            IMStatusCode::UnsupportedWrite => todo!(),
+            IMStatusCode::ResourceExhausted => todo!(),
+            IMStatusCode::NotFound => todo!(),
+            IMStatusCode::UnreportableAttribute => todo!(),
+            IMStatusCode::InvalidDataType => todo!(),
+            IMStatusCode::UnsupportedRead => todo!(),
+            IMStatusCode::DataVersionMismatch => todo!(),
+            IMStatusCode::Timeout => todo!(),
+            IMStatusCode::UnsupportedNode => todo!(),
+            IMStatusCode::Busy => todo!(),
+            IMStatusCode::AccessRestricted => todo!(),
+            IMStatusCode::UnsupportedCluster => todo!(),
+            IMStatusCode::NoUpstreamSubscription => todo!(),
+            IMStatusCode::NeedsTimedInteraction => todo!(),
+            IMStatusCode::UnsupportedEvent => todo!(),
+            IMStatusCode::PathsExhausted => todo!(),
+            IMStatusCode::TimedRequestMisMatch => todo!(),
+            IMStatusCode::FailSafeRequired => todo!(),
+            IMStatusCode::InvalidInState => todo!(),
+            IMStatusCode::NoCommandResponse => todo!(),
+            IMStatusCode::TermsAndConditionsChanged => todo!(),
+            IMStatusCode::MaintenanceRequired => todo!(),
+        }
+    }
 }
 
 impl From<ErrorCode> for IMStatusCode {

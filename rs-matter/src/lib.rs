@@ -113,6 +113,7 @@ pub mod cert;
 pub mod crypto;
 pub mod dm;
 pub mod error;
+pub mod new_error;
 pub mod fabric;
 pub mod failsafe;
 pub mod group_keys;

@@ -106,6 +106,20 @@ fn main() -> Result<(), Error> {
         TestOnOffDeviceLogic::new(false),
     );
 
+    let a = dm_handler(&matter, &on_off_handler);
+    let b =         endpoints::with_eth(
+            &(),
+            &UnixNetifs,
+            matter.rand(),
+            endpoints::with_sys(
+                &false,
+                matter.rand(),
+                EmptyHandler,
+            ),
+        );
+
+    b.run();
+
     // Create the Data Model instance
     let dm = DataModel::new(
         &matter,

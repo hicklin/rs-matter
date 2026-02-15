@@ -83,15 +83,24 @@ impl From<OpCode> for MessageMeta {
     }
 }
 
+/// Secure Channel Status Report Protocol Specific codes.
 #[derive(Debug, Copy, Clone, PartialEq, Eq)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum SCStatusCodes {
+    /// Indication that the last session establishment message was successfully processed.
     SessionEstablishmentSuccess = 0,
+    /// Failure to find a common set of shared roots.
     NoSharedTrustRoots = 1,
+    /// Generic failure during session establishment.
     InvalidParameter = 2,
+    /// Indication that the sender will close the current session.
     CloseSession = 3,
+    /// Indication that the sender cannot currently fulfill the request.
     Busy = 4,
-    SessionNotFound = 5,
+    /// Required CAT Mismatch during session establishment at the Sigma2 Validation step.
+    RequiredCatMismatch = 5,
+    // todo Where is this error defined? This does not seem to exist in the Matter spec.
+    SessionNotFound = 6,
 }
 
 impl SCStatusCodes {
@@ -107,6 +116,7 @@ impl SCStatusCodes {
             SCStatusCodes::Busy => GeneralCode::Busy,
             SCStatusCodes::InvalidParameter
             | SCStatusCodes::NoSharedTrustRoots
+            | SCStatusCodes::RequiredCatMismatch
             | SCStatusCodes::SessionNotFound => GeneralCode::Failure,
         };
 
@@ -141,27 +151,48 @@ pub fn sc_write(
     ))
 }
 
+/// General status codes conveyed in the GeneralCode field of a Status Report message.
+/// These are uniform codes that convey both success and failures.
 #[allow(dead_code)]
 #[derive(FromPrimitive, PartialEq, Eq, Debug, Copy, Clone)]
 #[cfg_attr(feature = "defmt", derive(defmt::Format))]
 pub enum GeneralCode {
+    /// Operation completed successfully.
     Success = 0,
+    /// Generic failure, additional details may be included in the _protocol specific status_.
     Failure = 1,
+    /// Operation was rejected by the system because the system is in an invalid state.
     BadPrecondition = 2,
+    /// A value was out of a required range.
     OutOfRange = 3,
+    /// A request was unrecognized or malformed.
     BadRequest = 4,
+    /// An unrecognized or unsupported request was received.
     Unsupported = 5,
+    /// A request was not expected at this time.
     Unexpected = 6,
+    /// Insufficient resources to process the given request.
     ResourceExhausted = 7,
+    /// Device is busy and cannot handle this request at this time.
     Busy = 8,
+    /// A timeout occurred.
     Timeout = 9,
+    ///  Context-specific signal to proceed.
     Continue = 10,
+    /// Failure, may be due to a concurrency error.
     Aborted = 11,
+    /// An invalid/unsupported argument was provided.
     InvalidArgument = 12,
+    ///  Some requested entity was not found.
     NotFound = 13,
+    ///  The sender attempted to create something that already exists.
     AlreadyExists = 14,
+    ///  The sender does not have sufficient permissions to execute the requested operations.
     PermissionDenied = 15,
+    /// Unrecoverable data loss or corruption has occurred.
     DataLoss = 16,
+    /// Message size is larger than the recipient can handle.
+    MessageTooLarge = 17,
 }
 
 /// Represents the session parameters
