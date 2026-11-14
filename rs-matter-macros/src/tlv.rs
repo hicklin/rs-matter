@@ -253,7 +253,7 @@ fn gen_totlv_for_struct_named(
                     #(
                         #krate::ToTLV::to_tlv(&self.#idents, &#krate::TLVTag::Context(#tags), &mut tw)?;
                     )*
-                    tw.end_container()
+                    Ok(tw.end_container()?)
                 })() {
                     tw.rewind_to(anchor);
                     Err(err)
@@ -346,7 +346,7 @@ fn gen_totlv_for_enum(
 
                     if let Err(err) = (|| {
                         match self {
-                            #( Self::#variant_names => tw.#write_func(tag, #tags), )*
+                            #( Self::#variant_names => Ok(tw.#write_func(tag, #tags)?), )*
                         }
                     })() {
                         tw.rewind_to(anchor);
@@ -455,7 +455,7 @@ fn gen_totlv_for_enum(
                                     Self::#variant_names(c) => #krate::ToTLV::to_tlv(c, &#krate::TLVTag::Context(#tags), &mut tw),
                                 )*
                             }?;
-                            tw.end_container()
+                            Ok(tw.end_container()?)
                         })() {
                             tw.rewind_to(anchor);
                             Err(err)

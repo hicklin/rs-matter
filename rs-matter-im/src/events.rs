@@ -306,7 +306,7 @@ impl<const N: usize> EventsInner<N> {
 
         let pos = event_writer.get_tail();
 
-        let result = (|| {
+        let result = (|| -> Result<(), Error> {
             EventData {
                 path: EventPath {
                     endpoint: Some(endpoint_id),
@@ -323,7 +323,7 @@ impl<const N: usize> EventsInner<N> {
 
             f(event_writer.tw())?;
 
-            event_writer.tw().end_container()
+            Ok(event_writer.tw().end_container()?)
         })();
 
         if let Err(e) = &result {
